@@ -1,0 +1,15 @@
+:80
+
+reverse_proxy {
+   dynamic a {
+      name     app
+      port     3000
+      refresh  "1s"
+   }
+
+   transport http {
+      response_header_timeout "5s"
+      read_timeout "5s"
+      write_timeout "5s"
+   }
+}

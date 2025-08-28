@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  h1= title
+  h2(style="margin: 0") The hostname is: #{hostname}
+  p Welcome to this horrible project. Please choose what you want to do:
+  ul.actions-list
+    li
+      a(href="/action/crash") Crash server
+      br
+      p Click here to crash this server. The NodeJS instance will exit normally. Future requests won't be served.
+    li    
+      a(href="/action/freeze") Freeze server
+      br
+      p Click here to freeze the server. The NodeJS instance will enter an infinite loop, causing it to become unresponsive, also to future requests.
+    li
+      a(href="/action/mute") Mute server
+      br
+      p Click here to mute the server. The NodeJS instance will stop responding to all future requests - but without using any CPU.
+    li
+      a(href="/action/load") Calculate things on the server (10s)
+      br
+      p The NodeJS instance will run some heavy calculations for 10s. However, it will still be responsive to other requests.

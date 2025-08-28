@@ -1,0 +1,48 @@
+services:
+  wp:
+    image: wordpress:latest 
+    labels:
+      - com.example.wpcompose.autoheal=true
+    ports:
+      - 8088:80
+    restart: always
+    volumes:
+      - ./wp_files:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wp
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: curl --fail http://localhost || exit 1
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mariadb:latest
+    labels:
+      - com.example.wpcompose.autoheal=true
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: wp
+      MARIADB_USER: wp
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    restart: always
+    volumes:
+      - wordpress-vol:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+  autoheal:
+    image: willfarrell/autoheal
+    restart: always
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=com.example.wpcompose.autoheal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+volumes:
+  wordpress-vol:

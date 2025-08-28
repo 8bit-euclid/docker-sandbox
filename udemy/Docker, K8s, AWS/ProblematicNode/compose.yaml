@@ -1,0 +1,28 @@
+services:
+  app:
+    build: ./bad-app
+    restart: unless-stopped
+    labels:
+      - com.example.node-app=true
+    deploy:
+      replicas: 4
+    healthcheck:
+      test: curl -f http://localhost:3000 || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
+  lb:
+    image: caddy
+    restart: unless-stopped
+    ports:
+      - 8888:80
+    volumes:
+      - ./lb/Caddyfile:/etc/caddy/Caddyfile:ro
+  autoheal:
+    image: willfarrell/autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=com.example.node-app
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
