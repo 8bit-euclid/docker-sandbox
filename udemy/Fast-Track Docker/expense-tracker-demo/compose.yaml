@@ -3,11 +3,13 @@ services:
   traefik: 
     image: traefik:v3.0
     container_name: traefik
-    command: 
+    command:
       # Enable Traefik Web UI (Use authentication in production)
       - "--api.insecure=true"
       # Enable Docker provider (Auto-detect running containers)
       - "--providers.docker=true"
+      # Only expose containers with traefik.enable=true label
+      - "--providers.docker.exposedbydefault=false"
       # Define HTTP entrypoint (Port 80)
       - "--entrypoints.web.address=:80"
     ports: 
@@ -33,7 +35,7 @@ services:
     env_file:
       - ./backend/.env
     ports:
-      - 5000:5000
+      - 5001:5000
     environment:
       - DATABASE_HOST=db
     labels:
@@ -50,7 +52,7 @@ services:
       args:
         VITE_API_BASE_URL: /api
     ports:
-      - 8080:80
+      - 8082:80
     labels: 
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
